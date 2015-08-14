@@ -18,13 +18,13 @@ union JavaRE2_Any {
 
     re2::StringPiece *get_s(void) {
         re2::StringPiece *s = reinterpret_cast<re2::StringPiece*>(sbuf_);
-        BOOST_VERIFY( reinterpret_cast<intptr_t>(sbuf_) == reinterpret_cast<intptr_t>(s) );
+        assert( reinterpret_cast<intptr_t>(sbuf_) == reinterpret_cast<intptr_t>(s) );
         return s;
     }
 
     re2::StringPiece *construct_s(void) {
         re2::StringPiece *s = new(sbuf_) re2::StringPiece();
-        BOOST_VERIFY(reinterpret_cast<intptr_t>(s) == reinterpret_cast<intptr_t>(get_s()));
+        assert(reinterpret_cast<intptr_t>(s) == reinterpret_cast<intptr_t>(get_s()));
         return s;
     }
 
@@ -65,7 +65,7 @@ private:
             any_.construct_s();
             return RE2::Arg(any_.get_s());
         default:
-            BOOST_VERIFY(0);
+            assert(0);
         }
     }
 
@@ -107,7 +107,7 @@ public:
             }
             break;
         default:
-            BOOST_VERIFY(0);
+            assert(0);
         }
     }
 
@@ -144,7 +144,7 @@ static bool is_double_arr(JNIEnv *env, jclass j_cls) {
 
 static bool is_string_arr(JNIEnv *env, jclass j_cls) {
     jclass j_arr_cls = env->FindClass("[Ljava/lang/String;");
-    BOOST_VERIFY(j_arr_cls);
+    assert(j_arr_cls);
     return env->IsAssignableFrom(j_cls, j_arr_cls);
 }
 
@@ -165,7 +165,7 @@ static JavaRE2_AnyType get_type(JNIEnv *env, jobject j_object) {
     if (is_string_arr(env, j_cls)) {
         return JavaRE2_STRING;
     }
-    BOOST_VERIFY(!"Unexpected parameter supplied"); // This should not occure, args are checked from Java
+    assert(!"Unexpected parameter supplied"); // This should not occure, args are checked from Java
 }
 
 static jsize sum_lengths(JNIEnv *env, jobjectArray j_args) {
@@ -185,13 +185,13 @@ static bool do_op(JNIEnv *env, const Op &op, jobjectArray j_args) {
 
         JavaRE2_Arg *get_arg(void) {
             JavaRE2_Arg *arg = reinterpret_cast<JavaRE2_Arg*>(_);
-            BOOST_VERIFY(reinterpret_cast<intptr_t>(arg) == reinterpret_cast<intptr_t>(_));
+            assert(reinterpret_cast<intptr_t>(arg) == reinterpret_cast<intptr_t>(_));
             return arg;
         }
 
         JavaRE2_Arg *construct_arg(JavaRE2_AnyType type, jarray j_array, const jsize j_index) {
             JavaRE2_Arg *arg = new(_) JavaRE2_Arg(type, j_array, j_index);
-            BOOST_VERIFY(reinterpret_cast<intptr_t>(arg) == reinterpret_cast<intptr_t>(get_arg()));
+            assert(reinterpret_cast<intptr_t>(arg) == reinterpret_cast<intptr_t>(get_arg()));
             return arg;
         }
 
@@ -202,7 +202,7 @@ static bool do_op(JNIEnv *env, const Op &op, jobjectArray j_args) {
     const jsize j_args_len = env->GetArrayLength(j_args);
     const jsize j_total_len = sum_lengths(env, j_args);
     if (j_total_len > 31) {
-        BOOST_VERIFY(!"Megical constant from re2 source code exceeded"); // This should not occure, args are checked from Java
+        assert(!"Megical constant from re2 source code exceeded"); // This should not occure, args are checked from Java
     }
 
     Buf buf_args[j_total_len];
@@ -219,8 +219,8 @@ static bool do_op(JNIEnv *env, const Op &op, jobjectArray j_args) {
     }
 
     const int total_len = static_cast<int>(j_total_len);
-    BOOST_VERIFY(static_cast<jsize>(total_len) == j_total_len);
-    BOOST_VERIFY(total_len > 0 == j_total_len > 0);
+    assert(static_cast<jsize>(total_len) == j_total_len);
+    assert(total_len > 0 == j_total_len > 0);
     bool ret = op(args, j_total_len);
 
     for (jsize j_i = 0; j_i < j_total_len; ++j_i) {

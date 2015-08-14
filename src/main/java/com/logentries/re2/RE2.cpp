@@ -6,7 +6,7 @@
  */
 
 #include <re2/re2.h>
-#include <boost/assert.hpp>
+#include <assert.h>
 #include <new>
 #include <cstdio>
 #include <string>
@@ -22,8 +22,8 @@ using namespace std;
 template<typename Dst, typename Src>
 static Dst safe_cast(Src src) {
     Dst dst = static_cast<Dst>(src);
-    BOOST_VERIFY(static_cast<Src>(dst) == src);
-    BOOST_VERIFY(dst > 0 == src > 0);
+    assert(static_cast<Src>(dst) == src);
+    assert(dst > 0 == src > 0);
     return dst;
 }
 
@@ -41,7 +41,7 @@ RE2::Options::Encoding get_re2_encoding(JNIEnv *env, jobject j_encoding) {
             return enc_fields[i];
         }
     }
-    BOOST_VERIFY(0);
+    assert(0);
 }
 
 jobject get_j_encoding(JNIEnv *env, RE2::Options::Encoding enc) {
@@ -56,12 +56,12 @@ jobject get_j_encoding(JNIEnv *env, RE2::Options::Encoding enc) {
             return item;
         }
     }
-    BOOST_VERIFY(0);
+    assert(0);
 }
 
 static jfieldID get_field_id_safe(JNIEnv *env, jclass j_cls, const char *name, const char *sig) {
     jfieldID fid = env->GetFieldID(j_cls, name, sig);
-    BOOST_VERIFY(fid != NULL);
+    assert(fid != NULL);
     return fid;
 }
 
@@ -83,7 +83,7 @@ JNIEXPORT void JNICALL Java_com_logentries_re2_Options_setDefaults
 }
 
 static void cpy_options(RE2::Options &options, JNIEnv *env, jobject j_options) {
-    BOOST_VERIFY(j_options != 0);
+    assert(j_options != 0);
     jclass j_options_cls = env->GetObjectClass(j_options);
     options.set_encoding(get_re2_encoding(env, env->GetObjectField(j_options, get_field_id_safe(env, j_options_cls, "encoding", "Lcom/logentries/re2/Encoding;"))));
     options.set_posix_syntax(env->GetBooleanField(j_options, get_field_id_safe(env, j_options_cls, "posixSyntax", "Z")));
@@ -109,7 +109,7 @@ public:
 
 static bool is_empty_arr(JNIEnv *env, jarray j_arr) {
     return j_arr == 0 || env->GetArrayLength(j_arr) == 0;
-    
+
 }
 
 static bool throw_RegExprException(JNIEnv *env, const char *msg) {
@@ -117,7 +117,7 @@ static bool throw_RegExprException(JNIEnv *env, const char *msg) {
 
     jclass j_cls = env->FindClass(class_name);
     if (j_cls == NULL) {
-        BOOST_VERIFY(!"Cannot find exception class :-(");
+        assert(!"Cannot find exception class :-(");
     }
 
     return env->ThrowNew(j_cls, msg) == 0;
@@ -131,7 +131,7 @@ JNIEXPORT jlong JNICALL Java_com_logentries_re2_RE2_compileImpl
     if (pointer->ok()) {
         env->ReleaseStringUTFChars(j_str, str);
         jlong j_pointer = reinterpret_cast<jlong>(pointer);
-        BOOST_VERIFY(reinterpret_cast<RE2*>(j_pointer) == pointer);
+        assert(reinterpret_cast<RE2*>(j_pointer) == pointer);
         return j_pointer;
     } else {
         throw_RegExprException(env, pointer->error().c_str());
