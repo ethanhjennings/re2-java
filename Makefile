@@ -9,22 +9,22 @@ NATIVES-TARGET=src/main/resources/NATIVE/$(shell bin/os-arch.sh)/$(shell bin/os-
 all: build
 build: $(OBJ)/libre2-java.so class
 
-#.re2.download.stamp:
-#	hg clone https://re2.googlecode.com/hg re2
-#	wget http://re2.googlecode.com/files/re2-20140304.tgz -O re2.tgz
-#	tar xvf re2.tgz
-#	touch .re2.download.stamp
+.re2.download.stamp:
+#       hg clone https://re2.googlecode.com/hg re2
+	wget http://re2.googlecode.com/files/re2-20140304.tgz -O re2.tgz
+	tar xvf re2.tgz
+	touch .re2.download.stamp
 
-.re2.compile.stamp:
+.re2.compile.stamp: .re2.download.stamp
 	cd re2 && make
 	touch .re2.compile.stamp
 
 $(OBJ)/RE2.o: $(addprefix src/main/java/com/logentries/re2/, RE2.cpp RE2.h)
 	mkdir -p $(OBJ)
-	$(CXX) -O3 -g -fPIC -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -Ire2 -c src/main/java/com/logentries/re2/RE2.cpp -o $(OBJ)/RE2.o
+	$(CXX) -O3 -g -fPIC -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -Ire2 -c src/main/java/com/logentries/re2/RE2.cpp -o $(OBJ)/RE2.o -Bstatic -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/libstdc++.so
 
 $(OBJ)/libre2-java.so: $(OBJ)/RE2.o .re2.compile.stamp
-	$(CXX) -shared -Wl,-soname,libre2-java.so -o $(OBJ)/libre2-java.so $(OBJ)/RE2.o  -Lre2/obj/so -lre2 -lpthread -static -libstdc++
+	$(CXX) -shared -Wl,-soname,libre2-java.so -o $(OBJ)/libre2-java.so $(OBJ)/RE2.o  -Lre2/obj/so -lre2 -lpthread -Bstatic -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/libstdc++.so
 	strip $(OBJ)/*
 
 class: build-class
