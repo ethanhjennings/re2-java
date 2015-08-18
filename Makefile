@@ -11,11 +11,11 @@ build: $(OBJ)/libre2-java.so class
 
 .re2.download.stamp:
 #       hg clone https://re2.googlecode.com/hg re2
-	wget http://re2.googlecode.com/files/re2-20140304.tgz -O re2.tgz
-	tar xvf re2.tgz
-	touch .re2.download.stamp
+#	wget http://re2.googlecode.com/files/re2-20140304.tgz -O re2.tgz
+#	tar xvf re2.tgz
+#	touch .re2.download.stamp
 
-.re2.compile.stamp: .re2.download.stamp
+.re2.compile.stamp: #.re2.download.stamp
 	cd re2 && make
 	touch .re2.compile.stamp
 
@@ -41,7 +41,7 @@ add-so: .re2.compile.stamp $(OBJ)/libre2-java.so
 lib: add-so
 
 clean:
-	rm -fr re2
+	#rm -fr re2
 	rm -f re2.tgz
 	rm -fr obj
 	rm -fr target
