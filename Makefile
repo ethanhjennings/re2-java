@@ -21,10 +21,10 @@ build: $(OBJ)/libre2-java.so class
 
 $(OBJ)/RE2.o: $(addprefix src/main/java/com/logentries/re2/, RE2.cpp RE2.h)
 	mkdir -p $(OBJ)
-	$(CXX) -O3 -g -fPIC -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -Ire2 -c src/main/java/com/logentries/re2/RE2.cpp -o $(OBJ)/RE2.o -Bstatic -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/libstdc++.so
+	$(CXX) -O3 -g -fPIC -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -Ire2 -c src/main/java/com/logentries/re2/RE2.cpp -o $(OBJ)/RE2.o -Bstatic -L/usr/lib64/libstdc++.so.6
 
 $(OBJ)/libre2-java.so: $(OBJ)/RE2.o .re2.compile.stamp
-	$(CXX) -shared -Wl,-soname,libre2-java.so -o $(OBJ)/libre2-java.so $(OBJ)/RE2.o  -Lre2/obj/so -lre2 -lpthread -Bstatic -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/libstdc++.so
+	$(CXX) -shared -Wl,-soname,libre2-java.so -o $(OBJ)/libre2-java.so $(OBJ)/RE2.o  -Lre2/obj/so -lre2 -lpthread -Bstatic -L/usr/lib64/libstdc++.so.6
 	strip $(OBJ)/*
 
 class: build-class
